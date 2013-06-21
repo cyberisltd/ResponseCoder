@@ -4,7 +4,6 @@ ResponseCoder
 <!--
     Copyright (C) 2013  Cyberis Ltd. Author geoff.jones@cyberis.co.uk
 
-    Version 0.1  - 21st June 2013
 
     This file is part of ResponseCoder, a server-side script is designed to 
     allow you to easily manipulate HTTP response headers, specifically to 
