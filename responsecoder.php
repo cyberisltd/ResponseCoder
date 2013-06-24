@@ -33,8 +33,8 @@
 $COMPRESS = '/usr/bin/compress';
 
 //Replace the following to files of your choosing.
-$EXEFILETODOWNLOAD = './test.exe';
-$TXTFILETODOWNLOAD = './test.txt';
+$EXEFILETODOWNLOAD = './helloworld.exe';
+$TXTFILETODOWNLOAD = './helloworld.txt';
 
 //Terminate with an appropriate error message if no parameters have been passed to this script.
 if (count($_REQUEST) == 0) {
