@@ -22,6 +22,8 @@ Dependencies
 ------------
 Apache and PHP are required (other web servers that support PHP may work - but you'll need to check how the server handles tampering with response headers). It is recommended that you edit php.ini to remove any default 'Content-Type' header - set *default_mimetype* to null.
 
+You'll also need to ensure you have a Unix compress tool (e.g ncompress) installed for 'compress' Content-Type encodings.
+
 Issues
 ------
 Kindly report all issues via https://github.com/cyberisltd/ResponseCoder/issues
