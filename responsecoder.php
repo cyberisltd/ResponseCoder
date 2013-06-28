@@ -79,7 +79,7 @@ if ($filename) {
 	header("Content-Disposition: attachment; filename=\"$filename\"");
 }
 
-//Set the user's suppliled 'Content-Length' if passed
+//Set the user's supplied 'Content-Length' if passed
 if ($contentlength) header("Content-Length: $contentlength");
 
 //Encode response as directed, setting the correct length, unless overridden.
