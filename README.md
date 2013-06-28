@@ -26,6 +26,8 @@ Apache and PHP are required (other web servers that support PHP may work - but y
 
 You'll also need to ensure you have a Unix compress tool (e.g ncompress) installed for 'compress' Content-Type encodings.
 
+To test for SDCH filtering bypass issues, you'll need a compatible browser, namely Chrome. You'll also need to set up your server with a FQDN - Chrome doesn't seem to like plain host names or IP addresses when using SDCH. 
+
 If you want to dive even deeper, you'll need Perl and the following modules to use httpversioncoder.pl:
 
 ```perl
