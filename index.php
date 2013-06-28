@@ -236,6 +236,6 @@
 	<li><a href='./responsecoder.php?responsecode=200&status=OK&contenttype=application%2Foctet-stream&contentencodingheading=&contentencoding=gzip&contentlength=&filename=test.exe&type=exe'>Executable download with no 'Content-Encoding' header set, but with an encoding of gzip</a></li>
 	<li><a href='./responsecoder.php?responsecode=200&status=OK&contenttype=application%2Foctet-stream&contentencodingheading=deflate&contentencoding=deflate1951&contentlength=&filename=test.exe&type=exe'>Executable download with a 'Content-Encoding of 'deflate' (RFC1951 - IE supported)</a></li>
 	<li><a href='./responsecoder.php?responsecode=200&status=OK&contenttype=application%2Foctet-stream&contentencodingheading=&contentencoding=&contentlength=-1&filename=test.exe&type=exe'>Executable download with a 'Content-Length' of '-1'</a></li>
-</ul>
+	<li><a href='./sdch/'>SDCH Encoding</a></li>
 </ul>
 </body>
