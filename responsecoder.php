@@ -40,7 +40,7 @@ $contentlength = "";
 $filename = "helloworld.exe";
 $type = "exe";
 $chunked = "";
-$file = $TXTFILETODOWNLOAD;
+$file = $EXEFILETODOWNLOAD;
 
 //Input validation - put some constraints on what manipulation can be carried out - relax if you can think of some test cases not possible within these constraints 
 if (isset($_REQUEST['responsecode'])) { 
