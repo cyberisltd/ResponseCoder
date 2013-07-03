@@ -268,7 +268,7 @@
 </form>
 <h2>Common Test Cases:</h2>
 <ul>
-	<li><a href='./responsecoder.php?responsecode=202&status=OK'>Executable download with a '202 OK' response code, all other headers present and correct</a></li>
+	<li><a href='./responsecoder.php?responsecode=206&status=OK'>Executable download with a '206 OK' response code, all other headers present and correct</a></li>
 	<li><a href='./responsecoder.php?contenttype=text%2Fhtml'>Executable download with a 'Content-Type' specified as 'text/html'</a></li>
 	<li><a href='./responsecoder.php?contentencodingheading1=gzip&contentencoding=gzip'>Executable download with a 'Content-Encoding' of 'gzip'</a></li>
 	<li><a href='./responsecoder.php?contentencoding=gzip'>Executable download with no 'Content-Encoding' header set, but with an encoding of gzip</a></li>
