@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Basic web server responding with a small page and logging the request to STDOUT
+# Basic web server responding with an executable file and logging the request to STDOUT
 # Returns an incorrect HTTP version number to see how intermediary devices handle the request
 
 # Copyright(C) 2013 Cyberis Limited
