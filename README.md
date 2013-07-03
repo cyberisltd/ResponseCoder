@@ -20,6 +20,13 @@ There are numerous tests you can conduct with HTTP response headers (take a look
 
 An online version of the PHP script is accessible in our labs - http://labs.cyberis.co.uk/ResponseCoder/
 
+Features
+--------
+* Ability to set common HTTP response headers
+* Ability to encode numerous 'Content-Encoding' types, including *gzip*, *deflate* (both RFC1950 and RFC1951), *bzip*, *compress*, *base64* and *SDCH*
+* Multiple layers of encoding
+* Supports Chunked Transport-Encoding
+
 Dependencies
 ------------
 Apache and PHP are required (other web servers that support PHP may work - but you'll need to check how the server handles tampering with response headers). It is recommended that you edit php.ini to remove any default 'Content-Type' header - set *default_mimetype* to null.

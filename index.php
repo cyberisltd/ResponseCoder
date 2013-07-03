@@ -34,6 +34,11 @@
 <p>Obviously manipulation of such HTTP response headers may lead to unexpected results in your browser - redirect codes, client errors and server error codes are typical examples that may (or should) cause a browser to ignore the body of a response. Try it for yourself - a 201 in Internet Explorer for example will cause it to ignore the specified filename in the 'Content-Disposition' header, whilst Chrome will accept that just fine.</p>
 <p>There are numerous tests you can conduct with HTTP response headers (take a look over at <a href="http://greenbytes.de/tech/tc2231/">http://greenbytes.de/tech/tc2231/</a> for some ideas), and this script certainly doesn't expose all possible scenarios. However it does provide a quick testing framework for intermediary filtering devices.</p>
 <p>This page exposes common options passed to the server-side script, though not all. Feel free to play around with GET parameters as necessary to accomplish your test cases (for example, 'responsecode' will take any integer value). NB: Fairly strict input validation is applied - if it prevents you running your specific test, grab the source and modify as necessary.</p>
+<p>The correct MD5 checksums for the two test files are as follows:</p>
+<ul>
+<li>helloworld.txt - <?php echo md5_file("./helloworld.txt");?></li>
+<li>helloworld.exe - <?php echo md5_file("./helloworld.exe");?></li>
+</ul>
 <form action="./responsecoder.php" method="get" enctype="application/x-www-form-urlencoded">
 <table>
 <tr>
@@ -173,12 +178,15 @@
         </td>
 </tr>
 <tr>
-        <td>Content-Transfer-Encoding (heading):</td>
+        <td>Content-Transfer-Encoding (first heading):</td>
         <td>
-                <select name="contentencodingheading">
+                <select name="contentencodingheading1">
                         <option value="">NONE</option>
                         <option value="gzip">gzip (RFC1952)</option>
-                        <option value="deflate">deflate (RFC1950)</option>
+                        <option value="gzip, gzip">gzip, gzip - (2 x gzip encoding)</option>
+                        <option value="gzip, deflate">gzip, deflate</option>
+                        <option value="deflate, gzip">deflate, gzip</option>
+                        <option value="deflate">deflate (RFC1950/1951)</option>
                         <option value="compress">compress (Unix Compress)</option>
                         <option value="bzip">bzip</option>
                         <option value="identity">identity (No encoding)</option>
@@ -187,11 +195,33 @@
         </td>
 </tr>
 <tr>
+        <td>Content-Transfer-Encoding (superfluous second heading):</td>
+        <td>
+                <select name="contentencodingheading2">
+                        <option value="">NONE</option>
+                        <option value="gzip">gzip (RFC1952)</option>
+                        <option value="gzip, gzip">gzip, gzip - (2 x gzip encoding)</option>
+                        <option value="gzip, deflate">gzip, deflate</option>
+                        <option value="deflate, gzip">deflate, gzip</option>
+                        <option value="deflate">deflate (RFC1950/1951)</option>
+                        <option value="compress">compress (Unix Compress)</option>
+                        <option value="bzip">bzip</option>
+                        <option value="identity">identity (No encoding)</option>
+                        <option value="base64">base64 (browsers are unlikely to decode this!)</option>
+                </select>
+	</td>
+</tr>
+<tr>
         <td>Content-Transfer-Encoding (actual):</td>
         <td>
                 <select name="contentencoding">
                         <option value="">NONE</option>
                         <option value="gzip">gzip (RFC1952)</option>
+                        <option value="2xgzip">2 rounds of gzip encoding</option>
+                        <option value="gzip+deflate1951">gzip + deflate1951</option>
+                        <option value="gzip+deflate1950">gzip + deflate1950</option>
+                        <option value="deflate1950+gzip">deflate1950+gzip</option>
+                        <option value="deflate1951+gzip">deflate1951+gzip</option>
                         <option value="deflate1950">deflate (RFC1950)</option>
                         <option value="deflate1951">deflate (RFC1951)</option>
                         <option value="compress">compress (Unix compress)</option>
@@ -209,11 +239,19 @@
         </td>
 </tr>
 <tr>
+	<td>
+		Chunked Encoding (will remove any set 'Content-Length' heading):
+	</td>
+	<td>
+		<input type="checkbox" name="chunked" value="chunked"/>
+	</td>
+</tr>
+<tr>
         <td>
                 Filename:
         </td>
         <td>
-                <input type="text" name="filename" value="test.exe" />(Leave blank for no 'Content-Disposition' header)
+                <input type="text" name="filename" value="helloworld.exe" />(Leave blank for no 'Content-Disposition' header)
         </td>
 </tr>
 <tr>
@@ -222,7 +260,7 @@
         </td>
         <td>
         	<input type="radio" name="type" checked value="exe">Win32 Exe</input>
-        	<input type="radio" name="type" value="txt">Plain text file</input>
+        	<input type="radio" name="type" value="txt">Plain-text file</input>
 	</td>
 </tr>
 <tr><td></td><td><input type="submit" name="Download" value="Download"/></td></tr>
@@ -230,12 +268,17 @@
 </form>
 <h2>Common Test Cases:</h2>
 <ul>
-	<li><a href='./responsecoder.php?responsecode=202&status=OK&contenttype=application%2Foctet-stream&contentencodingheading=&contentencoding=&contentlength=&filename=test.exe&type=exe'>Executable download with a '202 OK' response code, all other headers present and correct</a></li>
-	<li><a href='./responsecoder.php?responsecode=200&status=OK&contenttype=text%2Fhtml&contentencodingheading=&contentencoding=&contentlength=&filename=test.exe&type=exe'>Executable download with a 'Content-Type' specified as 'text/html'</a></li>
-	<li><a href='./responsecoder.php?responsecode=200&status=OK&contenttype=application%2Foctet-stream&contentencodingheading=gzip&contentencoding=gzip&contentlength=&filename=test.exe&type=exe'>Executable download with a 'Content-Encoding' of 'gzip'</a></li>
-	<li><a href='./responsecoder.php?responsecode=200&status=OK&contenttype=application%2Foctet-stream&contentencodingheading=&contentencoding=gzip&contentlength=&filename=test.exe&type=exe'>Executable download with no 'Content-Encoding' header set, but with an encoding of gzip</a></li>
-	<li><a href='./responsecoder.php?responsecode=200&status=OK&contenttype=application%2Foctet-stream&contentencodingheading=deflate&contentencoding=deflate1951&contentlength=&filename=test.exe&type=exe'>Executable download with a 'Content-Encoding of 'deflate' (RFC1951 - IE supported)</a></li>
-	<li><a href='./responsecoder.php?responsecode=200&status=OK&contenttype=application%2Foctet-stream&contentencodingheading=&contentencoding=&contentlength=-1&filename=test.exe&type=exe'>Executable download with a 'Content-Length' of '-1'</a></li>
-	<li><a href='./sdch/'>SDCH Encoding</a></li>
+	<li><a href='./responsecoder.php?responsecode=202&status=OK'>Executable download with a '202 OK' response code, all other headers present and correct</a></li>
+	<li><a href='./responsecoder.php?contenttype=text%2Fhtml'>Executable download with a 'Content-Type' specified as 'text/html'</a></li>
+	<li><a href='./responsecoder.php?contentencodingheading1=gzip&contentencoding=gzip'>Executable download with a 'Content-Encoding' of 'gzip'</a></li>
+	<li><a href='./responsecoder.php?contentencoding=gzip'>Executable download with no 'Content-Encoding' header set, but with an encoding of gzip</a></li>
+	<li><a href='./responsecoder.php?contentencodingheading1=deflate&contentencoding=deflate1951'>Executable download with a 'Content-Encoding of 'deflate' (RFC1951 - IE supported)</a></li>
+	<li><a href='./responsecoder.php?contentlength=-1'>Executable download with a 'Content-Length' of '-1'</a></li>
+	<li><a href='./responsecoder.php?contentencodingheading1=gzip&contentencodingheading2=gzip&contentencoding=2xgzip'>Executable download with two rounds of gzip encoding and two seperate gzip headers</a></li>
+	<li><a href='./responsecoder.php?contentencodingheading1=gzip%2c+gzip&contentencoding=2xgzip'>Executable download with two rounds of gzip encoding and one 'gzip, gzip' header</a></li>
+	<li><a href='./responsecoder.php?contentencodingheading1=gzip%2c+deflate&contentencoding=gzip%2bdeflate1951'>Executable download with gzip and deflate (RFC1951 encoding) compression and only one 'Content-Encoding' heading set with 'gzip, deflate'</a></li>
+	<li><a href='./responsecoder.php?chunked=true'>Executable download with chunked encoding and no compression</a></li>
+	<li><a href='./responsecoder.php?chunked=true&contentencodingheading1=gzip&contentencoding=gzip'>Executable download with chunked encoding and gzip compression</a></li>
+	<li><a href='./sdch/'>Shared Dictionary Compression over HTTP (SDCH) Encoding (currently Chrome only)</a></li>
 </ul>
 </body>

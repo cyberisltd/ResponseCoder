@@ -22,13 +22,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-/*  Ideas for future enchancements:
-	* Allow duplicate headers?
-	* Chuncked encoding?
-	* Ideas from http://greenbytes.de/tech/tc2231/
-*/
-
 //PHP doesn't offer an implementation of the old compress algorthim, so unfortunatly we must call the shell. Set the path below. 'ncompress' should give you the functionality you need.
 $COMPRESS = '/usr/bin/compress';
 
@@ -36,22 +29,52 @@ $COMPRESS = '/usr/bin/compress';
 $EXEFILETODOWNLOAD = './helloworld.exe';
 $TXTFILETODOWNLOAD = './helloworld.txt';
 
-//Terminate with an appropriate error message if no parameters have been passed to this script.
-if (count($_REQUEST) == 0) {
-	die("[ERROR] No parameters passed");
-}
+//Default options
+$responsecode = "200";
+$status = "OK";
+$contenttype = "application/octet-stream";
+$contentencodingheading1 = "";
+$contentencodingheading2 = "";
+$contentencoding = "";
+$contentlength = "";
+$filename = "helloworld.exe";
+$type = "exe";
+$chunked = "";
+$file = $TXTFILETODOWNLOAD;
 
 //Input validation - put some constraints on what manipulation can be carried out - relax if you can think of some test cases not possible within these constraints 
-$responsecode = filter_var($_REQUEST['responsecode'], FILTER_VALIDATE_INT, array('options'=>array('default' => '200')));
-$status = filter_var($_REQUEST['status'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^[A-Z \-\']+$/i')));
-$contenttype = filter_var($_REQUEST['contenttype'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^[A-Z\-\/]+$/i')));
-$contentencodingheading = filter_var($_REQUEST['contentencodingheading'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^[0-9A-Z\- ]+$/i')));
-$contentencoding = filter_var($_REQUEST['contentencoding'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^[0-9A-Z\- ]+$/i')));
-$contentlength = filter_var($_REQUEST['contentlength'], FILTER_VALIDATE_INT);
-$filename = filter_var($_REQUEST['filename'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^[A-Z0-9\.]+$/i')));
-$type = filter_var($_REQUEST['type'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^(txt|exe)$/i')));
-$file = $EXEFILETODOWNLOAD; //Download an exe as standard
+if (isset($_REQUEST['responsecode'])) { 
+	$responsecode = filter_var($_REQUEST['responsecode'], FILTER_VALIDATE_INT);
+}
+if (isset($_REQUEST['status'])) {
+	$status = filter_var($_REQUEST['status'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^[A-Z \-\']+$/i')));
+}
+if (isset($_REQUEST['contenttype'])) {
+	$contenttype = filter_var($_REQUEST['contenttype'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^[A-Z\-\/]+$/i')));
+}
+if (isset($_REQUEST['contentencodingheading1'])) {
+	$contentencodingheading1 = filter_var($_REQUEST['contentencodingheading1'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^[0-9A-Z\- ,]+$/i')));
+}
+if (isset($_REQUEST['contentencodingheading2'])) {
+	$contentencodingheading2 = filter_var($_REQUEST['contentencodingheading2'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^[0-9A-Z\- ,]+$/i')));
+}
+if (isset($_REQUEST['contentencoding'])) {
+	$contentencoding = filter_var($_REQUEST['contentencoding'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^[0-9A-Z\- \+]+$/i')));
+}
+if (isset($_REQUEST['contentlength'])) {
+	$contentlength = filter_var($_REQUEST['contentlength'], FILTER_VALIDATE_INT);
+}
+if (isset($_REQUEST['filename'])) {
+	$filename = filter_var($_REQUEST['filename'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^[A-Z0-9\.]+$/i')));
+}
+if (isset($_REQUEST['type'])) {
+	$type = filter_var($_REQUEST['type'], FILTER_VALIDATE_REGEXP, array('options'=>array('regexp' => '/^(txt|exe)$/i')));
+}
+if (isset($_REQUEST['chunked'])) {
+	$chunked = $_REQUEST['chunked'];
+}
 
+//Set the requested file type
 if ($type === 'txt') {
 	$file = $TXTFILETODOWNLOAD;
 }
@@ -61,7 +84,8 @@ if (!is_readable($file)){
 	die("[ERROR] Cannot read selected file '$file'");
 }
 
-//Manipulate the headers NB: Apache doesn't allow us to play around with the protocol version, although browsers do accept alternatives (e.g. blah/1.2)!
+//Manipulate the headers NB: Apache doesn't allow us to play around with the protocol version, although browsers do accept alternatives (e.g. blah/1.2)! 
+//Try httpversioncoder.pl if you want to manipulate the http version.
 header($_SERVER["SERVER_PROTOCOL"] . " $responsecode $status");
 
 //Set 'Content-Type' header if passed
@@ -69,9 +93,13 @@ if ($contenttype) {
 	header("Content-Type: $contenttype");
 }
 
-//Set 'Content-Encoding' header if passed
-if ($contentencodingheading) {
-	header("Content-Encoding: $contentencodingheading");
+//Set 'Content-Encoding' headers if passed
+if ($contentencodingheading1) {
+	header("Content-Encoding: $contentencodingheading1");
+}
+if ($contentencodingheading2) {
+	//The 'false' parameter forces a second 'Content-Encoding' header
+	header("Content-Encoding: $contentencodingheading2", false);
 }
 
 //Set 'Content-Disposition' header if passed
@@ -79,30 +107,34 @@ if ($filename) {
 	header("Content-Disposition: attachment; filename=\"$filename\"");
 }
 
-//Set the user's supplied 'Content-Length' if passed
-if ($contentlength) header("Content-Length: $contentlength");
-
-//Encode response as directed, setting the correct length, unless overridden.
+//Encode response as directed.
 switch ($contentencoding) {
 	case "base64":
-		$data =  base64_encode(file_get_contents($file));
-		if (!$contentlength) header("Content-Length: " . strlen($data));
-		echo $data;
+		$data = base64_encode(file_get_contents($file));
 		break;	
 	case "gzip":
 		$data = gzencode(file_get_contents($file));
-		if (!$contentlength) header("Content-Length: " . strlen($data));
-		echo $data;
+		break;
+	case "2xgzip":
+		$data = gzencode(gzencode(file_get_contents($file)));
 		break;
 	case "deflate1950":
 		$data = gzcompress(file_get_contents($file));
-		if (!$contentlength) header("Content-Length: " . strlen($data));
-		echo $data;
 		break;
 	case "deflate1951":
 		$data = gzdeflate(file_get_contents($file));
-		if (!$contentlength) header("Content-Length: " . strlen($data));
-		echo $data;
+		break;
+	case "gzip+deflate1950":
+		$data = gzcompress(gzencode(file_get_contents($file)));
+		break;
+	case "gzip+deflate1951":
+		$data = gzdeflate(gzencode(file_get_contents($file)));
+		break;
+	case "deflate1950+gzip":
+		$data = gzencode(gzcompress(file_get_contents($file)));
+		break;
+	case "deflate1951+gzip":
+		$data = gzencode(gzdeflate(file_get_contents($file)));
 		break;
 	case "compress":
 		if (!is_file($COMPRESS)) { 
@@ -110,19 +142,22 @@ switch ($contentencoding) {
 			die("Cannot find Unix compress tool. Select a different content-encoding");
 		}
 		$data = shell_exec("$COMPRESS -c $file");
-		if (!$contentlength) header("Content-Length: " . strlen($data));
-		echo $data;
 		break;
 	case "bzip":
 		$data = bzcompress(file_get_contents($file));
-		if (!$contentlength) header("Content-Length: " . strlen($data));
-		echo $data;
 		break;
 	default:
-		if (!$contentlength) header("Content-Length: " . filesize($file));
-		readfile($file);
+		$data = file_get_contents($file);
 }
 
-exit();        
+//Set the Content-Length header (unless overridden)
+if (!$contentlength && !$chunked) {
+	header("Content-Length: " . strlen($data));
+}
+else if ($contentlength) {
+	header("Content-Length: " . $contentlength);
+}
 
+//Return the actual data
+echo $data;
 ?>
