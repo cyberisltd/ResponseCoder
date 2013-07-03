@@ -267,11 +267,11 @@
 </table>
 </form>
 <h2>Common Test Cases:</h2>
+<p><i>NB: All of these test cases should pass on a recent version of Chrome.</i><p>
 <ul>
 	<li><a href='./responsecoder.php?responsecode=206&status=OK'>Executable download with a '206 OK' response code, all other headers present and correct</a></li>
 	<li><a href='./responsecoder.php?contenttype=text%2Fhtml'>Executable download with a 'Content-Type' specified as 'text/html'</a></li>
 	<li><a href='./responsecoder.php?contentencodingheading1=gzip&contentencoding=gzip'>Executable download with a 'Content-Encoding' of 'gzip'</a></li>
-	<li><a href='./responsecoder.php?contentencoding=gzip'>Executable download with no 'Content-Encoding' header set, but with an encoding of gzip</a></li>
 	<li><a href='./responsecoder.php?contentencodingheading1=deflate&contentencoding=deflate1951'>Executable download with a 'Content-Encoding of 'deflate' (RFC1951 - IE supported)</a></li>
 	<li><a href='./responsecoder.php?contentlength=-1'>Executable download with a 'Content-Length' of '-1'</a></li>
 	<li><a href='./responsecoder.php?contentencodingheading1=gzip&contentencodingheading2=gzip&contentencoding=2xgzip'>Executable download with two rounds of gzip encoding and two seperate gzip headers</a></li>
