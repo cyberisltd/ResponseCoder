@@ -24,7 +24,7 @@ Features
 --------
 * Ability to set common HTTP response headers
 * Ability to encode numerous 'Content-Encoding' types, including *gzip*, *deflate* (both RFC1950 and RFC1951), *bzip*, *compress*, *base64* and *SDCH*
-* Multiple layers of encoding
+* Multiple layers of encoding (responsecoder.php stacks up to 2 different types of encoding at once, with up to 10 rounds of gzip compression). If you want an arbitrary number of rounds of gzip encoded, test out gzipPoC.php
 * Supports Chunked Transport-Encoding
 
 Dependencies
