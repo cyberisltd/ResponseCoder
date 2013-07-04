@@ -118,6 +118,9 @@ switch ($contentencoding) {
 	case "2xgzip":
 		$data = gzencode(gzencode(file_get_contents($file)));
 		break;
+        case "10xgzip":
+	        $data = gzencode(gzencode(gzencode(gzencode(gzencode(gzencode(gzencode(gzencode(gzencode(gzencode(file_get_contents($file)))))))))));
+		break;
 	case "deflate1950":
 		$data = gzcompress(file_get_contents($file));
 		break;

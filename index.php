@@ -184,6 +184,7 @@
                         <option value="">NONE</option>
                         <option value="gzip">gzip (RFC1952)</option>
                         <option value="gzip, gzip">gzip, gzip - (2 x gzip encoding)</option>
+			<option value="gzip, gzip, gzip, gzip, gzip, gzip, gzip, gzip, gzip, gzip">gzip, gzip,... - (10 x gzip encoding)</option>
                         <option value="gzip, deflate">gzip, deflate</option>
                         <option value="deflate, gzip">deflate, gzip</option>
                         <option value="deflate">deflate (RFC1950/1951)</option>
@@ -218,6 +219,7 @@
                         <option value="">NONE</option>
                         <option value="gzip">gzip (RFC1952)</option>
                         <option value="2xgzip">2 rounds of gzip encoding</option>
+                        <option value="10xgzip">10 rounds of gzip encoding</option>
                         <option value="gzip+deflate1951">gzip + deflate1951</option>
                         <option value="gzip+deflate1950">gzip + deflate1950</option>
                         <option value="deflate1950+gzip">deflate1950+gzip</option>
